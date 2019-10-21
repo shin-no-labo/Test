@@ -1,0 +1,41 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from scipy import optimize as opt
+
+# To read data from CSV file.
+# Data format is concerning actual measuring parameter vs failed flag(0:not failed,1:Failed)
+df = pd.read_csv('data.csv')
+input_data = np.array(df)
+Px = input_data[:,0]
+Py = input_data[:,1]
+data_number = input_data.shape[0]
+
+print(input_data[:,0])
+print(input_data[:,1])
+
+#Approximate expression is sigmoid function.
+def fit_sigmoid(x, a , b, c, d):
+    y = 1 / (1 + np.exp(-a+b*(x/d+c)))
+    return y
+    
+res = opt.curve_fit(fit_sigmoid,Px,Py)
+
+# Result : a,b,c,d are constant parameter of sigmoid function.
+a = res[0][0]
+b = res[0][1]
+c = res[0][2]
+d = res[0][3]
+
+# To plot the graph
+Px2 = []
+for x in Px:
+    Px2.append( 1 / (1 + np.exp(-a+b*(x/d+c))))
+
+plt.scatter(Px,Py)
+plt.plot(Px,Px2)
+
+plt.show()
+
+output_data = res[0][:]
+print(output_data)
